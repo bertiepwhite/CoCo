@@ -149,7 +149,7 @@ void fitLC(std::shared_ptr<Workspace> w) {
             karpenka12->x_ = vmath::sub<double>(lc.second.mjd_, lc.second.mjdMin_);
             karpenka12->y_ = vmath::div<double>(lc.second.flux_, lc.second.normalization_);
             karpenka12->sigma_ = vmath::div<double>(lc.second.fluxErr_, lc.second.normalization_);
-            std::shared_ptr<Model> model = std::dynamic_pointer_cast<Model>(karpenßka12);
+            std::shared_ptr<Model> model = std::dynamic_pointer_cast<Model>(karpenka12);
 
             //std::shared_ptr<Bazin09> bazin09(new Bazin09);
             //bazin09->x_ = vmath::sub<double>(lc.second.mjd_, lc.second.mjdMin_);

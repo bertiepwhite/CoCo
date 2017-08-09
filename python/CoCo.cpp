@@ -105,7 +105,7 @@ void CoCo::simulate(std::string templateName,
 
     // synthesise LC for every unique filter
     std::vector<std::string> uniqueFilters = filterSim;
-    utils::removeDuplicates(uniqueFilters);ß
+    utils::removeDuplicates(uniqueFilters);
     sn.synthesiseLC(uniqueFilters, filters_);
 
     for (auto &lc : sn.lc_) {
