@@ -25,6 +25,7 @@
 
 #include "../src/core/utils.hpp"
 #include "../src/models/Karpenka12.hpp"
+#include "../src/models/Bazin09.hpp"
 #include "../src/solvers/Minuit.hpp"
 
 
@@ -73,6 +74,7 @@ std::vector<double> CoCo::mjdRange(std::string flt,
     return res;
 }
 
+
 void CoCo::simulate(std::string templateName,
                     double z,
                     double absMag,
@@ -81,8 +83,7 @@ void CoCo::simulate(std::string templateName,
                     double R_v,
                     double mjdPeak,
                     std::vector<double> mjdSim,
-                    std::vector<std::string> filterSim,
-                    std::vector<double> guessParams) {
+                    std::vector<std::string> filterSim) {
 
     flux_ = std::vector<double>(mjdSim.size(), 0);
     fluxErr_ = std::vector<double>(mjdSim.size(), 0);
@@ -104,20 +105,22 @@ void CoCo::simulate(std::string templateName,
 
     // synthesise LC for every unique filter
     std::vector<std::string> uniqueFilters = filterSim;
-    utils::removeDuplicates(uniqueFilters);
+    utils::removeDuplicates(uniqueFilters);ß
     sn.synthesiseLC(uniqueFilters, filters_);
 
     for (auto &lc : sn.lc_) {
         // Initialise model
-        std::shared_ptr<Karpenka12> karpenka12(new Karpenka12);
-        karpenka12->x_ = vmath::sub<double>(lc.second.mjd_, lc.second.mjdMin_);
-        karpenka12->y_ = vmath::div<double>(lc.second.flux_, lc.second.normalization_);
-        karpenka12->sigma_ = std::vector<double>(lc.second.flux_.size(), 1);
-        std::shared_ptr<Model> model = std::dynamic_pointer_cast<Model>(karpenka12);
+        // std::shared_ptr<Karpenka12> karpenka12(new Karpenka12);
+        // karpenka12->x_ = vmath::sub<double>(lc.second.mjd_, lc.second.mjdMin_);
+        // karpenka12->y_ = vmath::div<double>(lc.second.flux_, lc.second.normalization_);
+        // karpenka12->sigma_ = std::vector<double>(lc.second.flux_.size(), 1);
+        // std::shared_ptr<Model> model = std::dynamic_pointer_cast<Model>(karpenka12);
 
-        if (guessParams.size() > 0) {
-            model->paramGuess_ = guessParams;
-        }
+        std::shared_ptr<Bazin09> bazin09(new Bazin09);
+        bazin09->x_ = vmath::sub<double>(lc.second.mjd_, lc.second.mjdMin_);
+        bazin09->y_ = vmath::div<double>(lc.second.flux_, lc.second.normalization_);
+        bazin09->sigma_ = vmath::div<double>(lc.second.fluxErr_, lc.second.normalization_);
+        std::shared_ptr<Model> model = std::dynamic_pointer_cast<Model>(bazin09);
 
         // Initialise solver
         Minuit solver(model);
@@ -130,11 +133,6 @@ void CoCo::simulate(std::string templateName,
         solver.xRecon_ = vmath::add<double>(solver.xRecon_, lc.second.mjdMin_);
         solver.bestFit_ = vmath::mult<double>(solver.bestFit_, lc.second.normalization_);
 
-        bestFitParams_ = model->params_;
-        bestFitParams_.push_back(lc.second.normalization_);
-
-        paramMap_[lc.second.filter_] = bestFitParams_;
-
         size_t j = 0;
         for (size_t i = 0; i < filterSim.size(); ++i) {
             if (filterSim[i] == lc.second.filter_) {
@@ -145,18 +143,6 @@ void CoCo::simulate(std::string templateName,
     }
 }
 
-
-void CoCo::simulate(std::string templateName,
-                    double z,
-                    double absMag,
-                    double Ebv_MW,
-                    double Ebv_Host,
-                    double R_v,
-                    double mjdPeak,
-                    std::vector<double> mjdSim,
-                    std::vector<std::string> filterSim) {
-    simulate(templateName, z, absMag, Ebv_MW, Ebv_Host, R_v, mjdPeak, mjdSim, filterSim, {});
-}
 
  void CoCo::spec_photometry(std::string templateName,
                             double z,
