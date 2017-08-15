@@ -145,17 +145,17 @@ void fitLC(std::shared_ptr<Workspace> w) {
         // Loop though each filter
         for (auto lc : sn.second.lc_) {
             // Initialise the model
-            std::shared_ptr<Karpenka12> karpenka12(new Karpenka12);
-            karpenka12->x_ = vmath::sub<double>(lc.second.mjd_, lc.second.mjdMin_);
-            karpenka12->y_ = vmath::div<double>(lc.second.flux_, lc.second.normalization_);
-            karpenka12->sigma_ = vmath::div<double>(lc.second.fluxErr_, lc.second.normalization_);
-            std::shared_ptr<Model> model = std::dynamic_pointer_cast<Model>(karpenka12);
+            //std::shared_ptr<Karpenka12> karpenka12(new Karpenka12);
+            //karpenka12->x_ = vmath::sub<double>(lc.second.mjd_, lc.second.mjdMin_);
+            //karpenka12->y_ = vmath::div<double>(lc.second.flux_, lc.second.normalization_);
+            //karpenka12->sigma_ = vmath::div<double>(lc.second.fluxErr_, lc.second.normalization_);
+            //std::shared_ptr<Model> model = std::dynamic_pointer_cast<Model>(karpenka12);
 
-            //std::shared_ptr<Bazin09> bazin09(new Bazin09);
-            //bazin09->x_ = vmath::sub<double>(lc.second.mjd_, lc.second.mjdMin_);
-            //bazin09->y_ = vmath::div<double>(lc.second.flux_, lc.second.normalization_);
-            //bazin09->sigma_ = vmath::div<double>(lc.second.fluxErr_, lc.second.normalization_);
-            //std::shared_ptr<Model> model = std::dynamic_pointer_cast<Model>(bazin09);
+            std::shared_ptr<Bazin09> bazin09(new Bazin09);
+            bazin09->x_ = vmath::sub<double>(lc.second.mjd_, lc.second.mjdMin_);
+            bazin09->y_ = vmath::div<double>(lc.second.flux_, lc.second.normalization_);
+            bazin09->sigma_ = vmath::div<double>(lc.second.fluxErr_, lc.second.normalization_);
+            std::shared_ptr<Model> model = std::dynamic_pointer_cast<Model>(bazin09);
 
             // Initialise solver
             MNest solver(model);
